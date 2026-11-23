@@ -2,21 +2,113 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speaking Label</title>
-
     <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <script src="script.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>speaking Label</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: white;
+            color: black;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+            text-align: center;
+        }
+
+        #text {
+            font-size: clamp(32px, 8vw, 64px);
+            font-weight: bold;
+            overflow-wrap: anywhere;
+            margin-bottom: 40px;
+        }
+
+        #playButton {
+            width: 90px;
+            height: 90px;
+            border: none;
+            border-radius: 50%;
+            background: #1677e8;
+            color: white;
+            font-size: 42px;
+            cursor: pointer;
+        }
+
+        #playButton:active {
+            background: #0955a5;
+            transform: scale(0.95);
+        }
+    </style>
 </head>
 
 <body>
-    <main>
-        <div id="text"></div>
 
-        <button id="playButton" aria-label="Text vorlesen">
-            ▶
-        </button>
-    </main>
+    <div id="text"></div>
+
+    <button id="playButton" aria-label="Text vorlesen">
+        ▶
+    </button>
+
+    <script>
+
+        // Text aus URL auslesen
+        const params = new URLSearchParams(
+            window.location.search
+        );
+
+        const text = params.get("text") || "Kein Text angegeben";
+
+        // Text anzeigen
+        document.getElementById("text").textContent = text;
+
+        // Sprachausgabe
+        function speakText() {
+            speechSynthesis.cancel();
+
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = "de-DE";
+
+            speechSynthesis.speak(speech);
+        }
+
+        // Play-Button
+        document.getElementById("playButton")
+            .addEventListener("click", speakText);
+
+        // Jede Maus- oder Touchscreen-Berührung
+        document.addEventListener("pointerdown", (event) => {
+
+            // Play-Button nicht doppelt auslösen
+            if (event.target.closest("#playButton")) return;
+
+            speakText();
+        });
+
+        // Jede Tastatureingabe
+        document.addEventListener("keydown", (event) => {
+
+            if (event.repeat) return;
+
+            // Enter und Leertaste auf dem Play-Button
+            // lösen bereits dessen Klick aus
+            if (event.target.closest?.("#playButton")) return;
+
+            speakText();
+        });
+
+    </script>
+
 </body>
 </html>
