@@ -1,4 +1,21 @@
 
+// URL-Parameter auslesen
+const params = new URLSearchParams(window.location.search);
+const text = params.get("text") || "Kein Text angegeben";
+
+// Sprachausgabe
+function speakText() {
+    if (!("speechSynthesis" in window)) return;
+
+    speechSynthesis.cancel();
+
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "de-DE";
+
+    speechSynthesis.speak(speech);
+}
+
+// Schriftgröße automatisch anpassen
 function resizeWord() {
     const display = document.getElementById("text");
 
@@ -22,7 +39,7 @@ function resizeWord() {
 
         ctx.font = `bold ${size}px Arial`;
 
-        const metrics = ctx.measureText(display.textContent);
+        const metrics = ctx.measureText(text);
 
         if (
             metrics.width <= availableWidth &&
@@ -38,5 +55,36 @@ function resizeWord() {
     display.style.fontSize = best + "px";
 }
 
-window.addEventListener("DOMContentLoaded", resizeWord);
+// Initialisierung
+window.addEventListener("DOMContentLoaded", () => {
+
+    const display = document.getElementById("text");
+    const playButton = document.getElementById("playButton");
+
+    // Text anzeigen
+    display.textContent = text;
+
+    // Play-Button
+    playButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        speakText();
+    });
+
+    // Jede Maus- oder Touchscreen-Eingabe
+    document.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("#playButton")) return;
+        speakText();
+    });
+
+    // Jede Tastatureingabe
+    document.addEventListener("keydown", (event) => {
+        if (event.repeat) return;
+        speakText();
+    });
+
+    // Schriftgröße berechnen
+    resizeWord();
+});
+
+// Bei Größenänderung neu berechnen
 window.addEventListener("resize", resizeWord);
