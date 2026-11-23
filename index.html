@@ -1,7 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
+  <link rel="stylesheet" href="style.css">
+	<script src="script.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -91,7 +92,21 @@
       speechSynthesis.speak(speech);
 
     });
-    document.addEventListener("keydown", () => roll());
+    document.addEventListener("keydown", () => {
+
+      // Laufende Sprachausgabe stoppen
+      speechSynthesis.cancel();
+
+      // Sprachobjekt erstellen
+      const speech = new SpeechSynthesisUtterance(text);
+
+      // Deutsche Sprache einstellen
+      speech.lang = "de-DE";
+
+      // Vorlesen
+      speechSynthesis.speak(speech);
+
+    });
   </script>
 
   </script>
